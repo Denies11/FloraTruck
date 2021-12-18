@@ -1,0 +1,28 @@
+{
+  "name": "flora-truck",
+  "version": "0.0.1",
+  "description": "FloraTruck page",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start-dev": "live-server",
+    "build-dev": "webpack --mode=development",
+    "build": "webpack --mode=production"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Denies11/FloraTruck.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Denies11/FloraTruck/issues"
+  },
+  "homepage": "https://github.com/Denies11/FloraTruck#readme",
+  "dependencies": {},
+  "devDependencies": {
+    "live-server": "^1.2.1",
+    "webpack": "^5.65.0",
+    "webpack-cli": "^4.9.1"
+  }
+}
