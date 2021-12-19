@@ -34,8 +34,6 @@ class CustomSearchProvider {
         }
         // При формировании ответа можно учитывать offset и limit.
         resultPoints = resultPoints.splice(offset, limit);
-        console.log(resultPoints)
-
 
         const geoObjects = new ymaps.GeoObjectCollection();
         // Добавляем точки в результирующую коллекцию.
@@ -97,6 +95,16 @@ function getData() {
             phone: "8(800)Путин был тут",
             wh: "00:00-24:00"
         },
+        {
+            coords: [55.663263, 37.484063],
+            name: 'Метро',
+            address: "улица 26 Бакинских Комиссаров",
+            pochta:'',
+            phone: "8(800)Путин был тут дважды",
+            wh: "00:00-24:00"
+        },
+
+        
     ];
     return data;
 }
@@ -110,18 +118,25 @@ function getData() {
 function getMapMarkers(geoPoints) {
     const markersCollection = new ymaps.GeoObjectCollection();
     for (const p of geoPoints) {
-        markersCollection.add(new ymaps.Placemark(p.coords, {
-            balloonContentHeader: p.name+'<br> ' +
-                '<span class="description"></span>',
-            // Зададим содержимое основной части балуна.
-            balloonContentBody: '<img src="img/cinema.jpg" height="150" width="200"> <br/> ' +
+        markersCollection.add(new ymaps.Placemark(
+            p.coords, 
+            {
+                balloonContentHeader: p.name+'<br> ' +
+                                      '<span class="description"></span>',
+                // Зададим содержимое основной части балуна.
+                balloonContentBody: '<img src="img/cinema.jpg" height="150" width="200"> <br/> ' +
                 '<a href="tel:+7-123-456-78-90">+7 (123) 456-78-90</a><br/>' +
                 '<b>Ближайшие сеансы</b> <br/> Сеансов нет.',
-            // Зададим содержимое нижней части балуна.
-            balloonContentFooter: 'Информация предоставлена:<br/>OOO ""',
-            // Зададим содержимое всплывающей подсказки.
-            hintContent: ''
-        }));
+                // Зададим содержимое нижней части балуна.
+                balloonContentFooter: 'Информация предоставлена:<br/>OOO ""',
+                // Зададим содержимое всплывающей подсказки.
+                hintContent: ''
+            },
+            {
+                iconLayout: "default#image",
+                iconImageHref: "image/map_marker.svg"
+            }
+        ));
     }
 
     return markersCollection
@@ -138,10 +153,10 @@ function getMySearchControl(geoPoints) {
     const MySearchControlPopupItemLayoutClass = ymaps.templateLayoutFactory.createClass(
         '<div class="item_container">' +
         '<div class="item_name">{{ data.name }}</div>' +
-        '<div class="item_address">{{ data.address}}</div>' +
-        '<div class="item_address">{{ data.pochta}}</div>' +
+        '<div class="item_address">{{ data.address }}</div>' +
+        '<div class="item_address">{{ data.pochta }}</div>' +
         '<div class="item_phone">{{ data.phone|default:"неизвестно" }}</div>' +
-        '<div class="item_wh">Время работы: {% if data.wh %} {{data.wh}} {% else %} не работает{% endif %}</div>' +
+        '<div class="item_wh">Время работы: {% if data.wh %} {{ data.wh }} {% else %} не работает{% endif %}</div>' +
         '</div>'
     );
 
@@ -153,14 +168,37 @@ function getMySearchControl(geoPoints) {
             // Не будем показывать еще одну метку при выборе результата поиска,
             // т.к. метки коллекции myCollection уже добавлены на карту.
             noPlacemark: true,
+            noCentering: true,
             resultsPerPage: 5,
             popupItemLayout: MySearchControlPopupItemLayoutClass
-        }});
+    }});
+
+    // Настраиваем зум при выборе варианта
+    mySearchControl.events.add("resultshow", async function(e) {
+        const resultIndex = e.get("index");
+        const myMap = mySearchControl.getMap();
+        mySearchControl.prevCenter = myMap.getCenter();
+        mySearchControl.prevZoom = myMap.getZoom();
+        const point = await mySearchControl.getResult(resultIndex);
+        const newCoordinates = point.geometry.getCoordinates();
+        myMap.setCenter(newCoordinates, 15, {
+            checkZoomRange: true
+        });
+    });
+
+    // Возвращаем зум при очистке
+    mySearchControl.events.add("clear", function(e) {
+        if (mySearchControl.prevCenter && mySearchControl.prevZoom) {
+            const myMap = mySearchControl.getMap();
+            myMap.setCenter(mySearchControl.prevCenter, mySearchControl.prevZoom);
+        }
+    });
+
     return mySearchControl
 }
 
 
-/**
+/** 
  * Инициализация Яндекс.Карт
  */
 function initYandexMapsCallback() {
