@@ -13,11 +13,9 @@ class CustomSearchProvider {
   /**
    * Функция поиска по тексту
    * @param {string} request - Поиcковый запрос
-   * @param {object} options - Опции поискового запросы
+   * @param {object} options - Опции поискового запроса
    * @return {object} Промис от vow объекта
    */
-
-
   geocode(request, options) {
     const deferred = new ymaps.vow.defer(),
       // Сколько результатов нужно пропустить.
@@ -69,6 +67,32 @@ class CustomSearchProvider {
     // Возвращаем объект-обещание.
     return deferred.promise();
   }
+
+
+  /**
+   * Функция выдачи подсказки поисковых запросов по тексту
+   * @param {string} request - Поиcковый запрос
+   * @param {object} options - Опции поискового запроса
+   * @return {object} Промис от vow объекта (массив подсказок в случае удачи)
+   */
+  suggest(request, options) {
+    const deferred = new ymaps.vow.defer(),
+          resultArray = [];
+    for (let i = 0; i < this.geoPoints.length; i++) {
+      const geoPoint = this.geoPoints[i];
+      if (geoPoint.name.toLowerCase().indexOf(request.toLowerCase()) != -1) {
+        resultArray.push({
+          displayName: geoPoint.name,
+          value: geoPoint.name,
+        });
+      }
+    }
+    const resultsCount = Math.min(options.results || 5, resultArray.length); 
+    
+    deferred.resolve(resultArray.slice(0, resultsCount));
+    return deferred.promise();
+  }
+
 }
 
 
@@ -173,7 +197,6 @@ function getMySearchControl(geoPoints) {
       popupItemLayout: MySearchControlPopupItemLayoutClass
     }
   });
-  console.log(mySearchControl);
 
   // Настраиваем зум при выборе варианта
   mySearchControl.events.add("resultshow", async function (e) {
