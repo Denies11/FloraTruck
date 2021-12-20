@@ -98,6 +98,7 @@ function getMySearchControl(geoPoints) {
       noPlacemark: true,
       noCentering: true,
       resultsPerPage: 5,
+      placeholderContent: "ПОИСК СКЛАДА",
       popupItemLayout: MySearchControlPopupItemLayoutClass
     }
   });
