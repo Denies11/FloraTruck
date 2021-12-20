@@ -16,9 +16,10 @@ function initInstafeed() {
     const c = document.getElementById("feed");
     const feed = new Instafeed({
       accessToken: token,
+      error: console.error,
+      limit: 4,
       target: c,
       template: template,
-      error: console.error
     });
     feed.run();
   });
