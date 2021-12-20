@@ -1,22 +1,27 @@
 import Instafeed from "instafeed.js";
 import initYandexMapsCallback from "./ymapsSettings";
 
-const TOKEN = "IGQVJYeEtmVlBIclIyb0ZA2SE9zaWJPRGFSZAnpvdGwtb0xiSldJYzUwYnpSQVVmM3VZAY09FNzBkZA1lueG01TWFKYTVNNEEtYUEtZAi1jY3JoVkRJN3RqcXYydVFnd2gwb3ExSVdYNzRrSFlWZAGQ3NlEtOE5uM21JTDJmOTZAN"
 
 
 function initInstafeed() {
-  const c = document.getElementById("instfeed");
-  if (!c) {
-    setTimeout(waitYMaps, 1);
-  } else {
-    var feed = new Instafeed({
-      accessToken: TOKEN,
-      debug: true,
-      target: c,
-      error: console.error
-    });
-    feed.run();
-  }
+  document.addEventListener("DOMContentLoaded", e => {
+  const template = '<div class="insta_media">' +
+                   '<a href="{{link}}" class="insta_media_link">' +
+                   '<img src="{{image}}" class="insta_media_img">' +
+                   '</a>' + 
+                   '<div class="insta_media_description">{{caption}}</div>' +
+                   '</div>';
+
+  const token = "IGQVJXWW1mNy1OeFlsbDF4Wkx2WG1haktyOWhoOFR2XzhRMWtZAeXJENmJOQjBsQ0Y0dnFlLVY2M2FFYVVFaXg3THFrNVZAmamNwTlp1UWFpR1JDbG9kN2hZAVW1ENE43OFh1bl9ncXNkY3ZAGMjVPaGo1WgZDZD";  
+  const c = document.getElementById("feed");
+  const feed = new Instafeed({
+    accessToken: token,
+    target: c,
+    template: template,
+    error: console.error
+  });
+  feed.run();
+  });
 }
 
 
